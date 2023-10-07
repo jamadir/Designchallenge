@@ -65,7 +65,7 @@ void stepper::changespeed(int moveval) {
 }
 
 
-void stepper::switchdir() {
-  movedir = !movedir;
+void stepper::switchdir(bool dir) {
+  movedir = dir;
   digitalWrite(dirpin, movedir);
 }

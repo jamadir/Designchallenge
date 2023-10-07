@@ -45,6 +45,6 @@ public:
   stepper(int steppin, int dirpin, int enpin);
   void startmove();
   void stopmove();
-  void switchdir();
+  void switchdir(bool dir);
   void changespeed(int movespeed);
 };

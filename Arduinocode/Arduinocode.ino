@@ -3,6 +3,7 @@
 #define usbpwmpin 3
 #define endstop1pin 7
 #define endstop2pin 9
+#define bestaetigenpin 8
 #define pot1pin 19
 #define pot2pin 20
 #define stepperenpin 18
@@ -18,6 +19,10 @@ int statecounter = 0;
 
 endstop anfang1(endstop1pin);
 endstop ende1(endstop2pin);
+endstop anfang2(endstop1pin);
+endstop ende2(endstop1pin);
+
+endstop bestaeigen(bestaetigenpin);
 
 usbport usb(usbpwmpin);
 
@@ -65,4 +70,36 @@ void loop() {
 
   stepperm1.changespeed(poti2.getstate());
   stepperm2.changespeed(poti2.getstate());
+
+
+
+  switch (statecounter) {
+    case 0:
+      if(!anfang1.getstate()){
+        stepperm1.switchdir(false);
+        stepperm1.startmove();
+      }
+      if(!anfang2.getstate()){
+        stepperm2.switchdir(false);
+        stepperm1.startmove();
+      }else{
+        if(anfang1.getstate()){
+          statecounter = 1;
+        }
+      }
+
+    case 1:
+      if(bestaeigen.getstate()){
+        statecounter = 2;
+      }
+
+    case 2:
+      if(ende1.getstate()){
+        stepperm1.stopmove();
+      }
+      if(ende2.getstate()){
+        stepperm2.stopmove();
+      }
+
+  }
 }
