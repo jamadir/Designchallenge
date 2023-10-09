@@ -45,20 +45,27 @@ stepper stepperm2(stepper2steppin, stepper2dirpin, stepper2enpin);
 
 
 void setup() {
-  Serial.begin(9600);
 
-  //set timer0 interrupt at 2kHz   Notwendig für Stepper geschwindigkeitssteuerung
-  TCCR0A = 0;
-  TCCR0B = 0;
-  TCNT0 = 0;
+  if (statecounter == -1) {
+    Serial.begin(9600);
+  }
 
-  OCR0A = 124;
-  TCCR0A |= (1 << WGM01);
-  TCCR0B |= (1 << CS01) | (1 << CS00);
-  TIMSK0 |= (1 << OCIE0A);
+
+  //set timer1 interrupt at 200kHz   Notwendig für Stepper geschwindigkeitssteuerung
+  TCCR1A = 0;  // set entire TCCR1A register to 0
+  TCCR1B = 0;  // same for TCCR1B
+  TCNT1 = 0;   //initialize counter value to 0
+  // set compare match register for 1hz increments
+  OCR1A = 1249;  // = (16*10^6) / (1*1024) - 1 (must be <65536)
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  // Set CS10 and CS12 bits for 64 prescaler
+  TCCR1B |= (1 << CS11) | (1 << CS10);
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
 }
 
-ISR(TIMER0_COMPA_vect) {  //timer0 interrupt 2kHz toggles pin 8  Stepper geschwindigkeitssteuerung
+ISR(TIMER1_COMPA_vect) {  //timer0 interrupt 2kHz toggles pin 8  Stepper geschwindigkeitssteuerung
 
   //if(bitRead(myBitArray,31)){
   digitalWrite(stepper1steppin, toggle);
@@ -118,7 +125,7 @@ void loop() {
         stepperm1.switchdir(true);  //direction ist true -> Vorwärts
         stepperm1.startmove();      //starte stepper bewegung
       } else {
-        stepperm1.stopmove();       //anhalten
+        stepperm1.stopmove();  //anhalten
       }
       if (!ende2.getstate()) {
         stepperm2.switchdir(true);
@@ -126,8 +133,30 @@ void loop() {
       } else {
         stepperm2.stopmove();
       }
-      if (ende1.getstate() and ende2.getstate()) {    //beginne neu
+      if (ende1.getstate() and ende2.getstate()) {  //beginne neu
         statecounter = 0;
       }
+
+    case -1:  //Debugging outputs werden im seriellen Monitor dargestellt
+      Serial.println("endstops:");
+      Serial.print("   a1: ");
+      Serial.print(anfang1.getstate());
+      Serial.print("   e1: ");
+      Serial.print(ende1.getstate());
+      Serial.print("   a2: ");
+      Serial.print(anfang1.getstate());
+      Serial.print("   e2: ");
+      Serial.println(ende1.getstate());
+
+      Serial.print("Potis:");
+      Serial.print("   P1: ");
+      Serial.print(poti1.getstate());
+      Serial.print("   P2: ");
+      Serial.println(poti2.getstate());
+
+      stepperm1.switchdir(true);
+      stepperm1.changespeed(50);
+      stepperm1.startmove();
+
   }
 }
