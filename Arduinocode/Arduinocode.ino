@@ -22,10 +22,15 @@
 #define stepper1dirpin 14  //Stepper dir
 #define stepper2dirpin 10
 
+#define Motorspeedrange 10    //mindestgeschwindigkeit = maxspeed/Motorspeedrange
+
+#define Maxmotorspeedmm 10    //Geschwindigkeit Fahrrad in mm pro Sekunde 
+#define Maxmotorspeed (16000000)/(3*Maxmotorspeedmm*64)-1    //=(16000000)/(Hz*64)-1   Resultierendes compare match register
+
 
 bool toggle = false;
 uint32_t myBitArray = 0;
-int statecounter = 0;
+int statecounter = -1;
 
 endstop anfang1(endstop1pina);  //Endstops initialisieren
 endstop ende1(endstop1pine);
@@ -39,8 +44,8 @@ usbport usb(usbpwmpin);
 potentiometer poti1(pot1pin);  //Potis initialisieren
 potentiometer poti2(pot2pin);
 
-stepper stepperm1(stepper1steppin, stepper1dirpin, stepper1enpin);  //Stepper initialisieren
-stepper stepperm2(stepper2steppin, stepper2dirpin, stepper2enpin);
+stepper stepperm1(stepper1steppin, stepper1dirpin, stepper1enpin, Maxmotorspeed, Motorspeedrange);  //Stepper initialisieren
+stepper stepperm2(stepper2steppin, stepper2dirpin, stepper2enpin, Maxmotorspeed, Motorspeedrange);
 
 
 
@@ -154,9 +159,10 @@ void loop() {
       Serial.print("   P2: ");
       Serial.println(poti2.getstate());
 
+      Serial.print(Maxmotorspeed);
+
       stepperm1.switchdir(true);
       stepperm1.changespeed(50);
       stepperm1.startmove();
-
   }
 }

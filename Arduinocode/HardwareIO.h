@@ -37,12 +37,14 @@ private:
   int steppin;
   int dirpin;
   int enpin;
+  int maxspeed;
+  int rangespeed;
   bool movedir = false;
   bool enabled = true;
   int movespeed = 10;
 
 public:
-  stepper(int steppin, int dirpin, int enpin);
+  stepper(int steppin, int dirpin, int enpin, int avspeed, int srange);
   void startmove();
   void stopmove();
   void switchdir(bool dir);

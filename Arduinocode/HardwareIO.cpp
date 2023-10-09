@@ -29,10 +29,12 @@ int potentiometer::getstate() {
 }
 
 
-stepper::stepper(int spin, int dpin, int epin) {
+stepper::stepper(int spin, int dpin, int epin, int mspeed, int srange) {
   steppin = spin;
   dirpin = dpin;
   enpin = epin;
+  maxspeed = mspeed;
+  rangespeed = srange;
 
   bool movedir = false;
   bool enabled = true;
@@ -54,10 +56,9 @@ void stepper::stopmove() {
 
 void stepper::changespeed(int moveval) {
   cli();
-
   //=(16*10^A2)/(B1*A1)-1
 
-  int speed = map(moveval, 0, 100, 0.1, 10) * 1249;
+  int speed = map(moveval, 0, 100, 0, rangespeed) * maxspeed;
   OCR1A = speed;
 
   sei();
