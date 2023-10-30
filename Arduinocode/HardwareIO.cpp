@@ -2,7 +2,7 @@
 
 endstop::endstop(int pin) {
   pin = pin;
-  pinMode(pin, INPUT);
+  pinMode(pin, INPUT_PULLUP);
 }
 
 bool endstop::getstate() {

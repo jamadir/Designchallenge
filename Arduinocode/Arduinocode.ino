@@ -33,7 +33,7 @@
 
 bool toggle = false;
 uint32_t myBitArray = 0;
-int statecounter = -1;
+int statecounter = 0;
 
 endstop anfang1(endstop1pina);  //Endstops initialisieren
 endstop ende1(endstop1pine);
@@ -54,12 +54,12 @@ stepper stepperm2(stepper2steppin, stepper2dirpin, stepper2enpin, Maxmotorspeed,
 
 void setup() {
 
-  if (statecounter == -1) {
-    Serial.begin(9600);
+  if (statecounter == 0) {
+    Serial.begin(115200);
   }
 
 
-  //set timer1 interrupt at 200kHz   Notwendig für Stepper geschwindigkeitssteuerung
+  //set timer1 interrupt at 200kHz   NotwendUig für Stepper geschwindigkeitssteuerung
   TCCR1A = 0;  // set entire TCCR1A register to 0
   TCCR1B = 0;  // same for TCCR1B
   TCNT1 = 0;   //initialize counter value to 0
@@ -90,32 +90,34 @@ ISR(TIMER1_COMPA_vect) {  //timer0 interrupt 2kHz toggles pin 8  Stepper geschwi
 
 void loop() {
 
-  int usbpower = map(poti1.getstate(), 0, 100, 0, 254);  //Poti.getstate returnt spannung des potis von 0 bis 100
+  int usbpower = map(analogRead(pot2pin), 0, 255, 0, 254);  //Poti.getstate returnt spannung des potis von 0 bis 100
   usb.setpower(usbpower);                                // setze usb pwm wert
 
-  stepperm1.changespeed(poti2.getstate());  //stepper.changespeed nimmt wert von 0 bis 100 als geschwindigkeit aus poti
-  stepperm2.changespeed(poti2.getstate());
+  stepperm1.changespeed(analogRead(pot1pin));  //stepper.changespeed nimmt wert von 0 bis 100 als geschwindigkeit aus poti
+  stepperm2.changespeed(analogRead(pot1pin));
 
 
 
+  Serial.println(statecounter);
   switch (statecounter) {  //Start Schrittkette
-
     case 0:
-      if (!anfang1.getstate()) {     //solange anfangstaster nicht gedrückt
-        stepperm1.switchdir(false);  //direction ist false -> rückwärts
-        stepperm1.startmove();       //starte stepper bewegung
+      if (!digitalRead(endstop1pina)) {     //solange anfangstaster nicht gedrückt
+        digitalWrite(stepper1dirpin, 0);  //direction ist false -> rückwärts
+        digitalWrite(stepper1enpin, 1);
+        //starte stepper bewegung
       } else {
-        stepperm1.stopmove();  //anhalten
+        digitalWrite(stepper1enpin, 0);  //anhalten
       }
-      if (!anfang2.getstate()) {
-        stepperm2.switchdir(false);
-        stepperm2.startmove();
+      if (!digitalRead(endstop2pina)) {
+        digitalWrite(stepper2dirpin, 0);
+        digitalWrite(stepper2enpin, 1);
       } else {
-        stepperm2.stopmove();
+        digitalWrite(stepper2enpin, 0);
       }
-      if (anfang1.getstate() and anfang2.getstate()) {  //wenn beide am anfang sind nächster schritt
+      if (digitalRead(endstop1pina) and digitalRead(endstop1pina)) {  //wenn beide am anfang sind nächster schritt
         statecounter = 1;
       }
+      break;
 
 
     case 1:
@@ -126,46 +128,50 @@ void loop() {
       if (bestaeigen.getstate()) {  //bei bestätigung nächster Schritt
         statecounter = 2;
       }
+      break;
 
     case 2:
 
-      if (!ende1.getstate()) {      //solange endtaster nicht gedrückt
-        stepperm1.switchdir(true);  //direction ist true -> Vorwärts
-        stepperm1.startmove();      //starte stepper bewegung
+      if (!digitalRead(endstop1pine)) {      //solange endtaster nicht gedrückt
+        digitalWrite(stepper1dirpin, 1);  //direction ist true -> Vorwärts
+        digitalWrite(stepper1enpin, 1);      //starte stepper bewegung
       } else {
-        stepperm1.stopmove();  //anhalten
+        digitalWrite(stepper1enpin, 0);  //anhalten
       }
-      if (!ende2.getstate()) {
-        stepperm2.switchdir(true);
-        stepperm2.startmove();
+      if (!digitalRead(endstop2pine)) {
+        digitalWrite(stepper2dirpin, 1);
+        digitalWrite(stepper2enpin, 1);
       } else {
-        stepperm2.stopmove();
+        digitalWrite(stepper2enpin, 0);
       }
-      if (ende1.getstate() and ende2.getstate()) {  //beginne neu
+      if (digitalRead(endstop1pine) and digitalRead(endstop2pine)) {  //beginne neu
         statecounter = 0;
       }
+      break;
 
     case -1:  //Debugging outputs werden im seriellen Monitor dargestellt
       Serial.println("endstops:");
       Serial.print("   a1: ");
-      Serial.print(anfang1.getstate());
+      Serial.print(digitalRead(endstop1pina));
       Serial.print("   e1: ");
-      Serial.print(ende1.getstate());
+      Serial.print(digitalRead(endstop1pine));
       Serial.print("   a2: ");
-      Serial.print(anfang1.getstate());
+      Serial.print(digitalRead(endstop2pina));
       Serial.print("   e2: ");
-      Serial.println(ende1.getstate());
+      Serial.println(digitalRead(endstop2pine));
 
       Serial.print("Potis:");
       Serial.print("   P1: ");
-      Serial.print(poti1.getstate());
+      Serial.print(analogRead(pot1pin));
       Serial.print("   P2: ");
-      Serial.println(poti2.getstate());
+      Serial.println(analogRead(pot2pin));
 
       Serial.print(Maxmotorspeed);
 
       stepperm1.switchdir(true);
       stepperm1.changespeed(50);
       stepperm1.startmove();
+      delay(100);
+      break;
   }
 }
