@@ -1,56 +1,53 @@
 #include "HardwareIO.h"
 
 endstop::endstop(int pin) {
-  pin = pin;
-  pinMode(pin, INPUT);
+  _pin = pin;
+  pinMode(_pin, INPUT_PULLUP);
 }
 
 bool endstop::getstate() {
-  return digitalRead(pin);
+  return !digitalRead(_pin);    //Invertiert da schließer
 }
 
 
 usbport::usbport(int pwmpin) {
-  pwmpin = pwmpin;
+  _pwmpin = pwmpin;
 }
 
 void usbport::setpower(int pwm) {
-  analogWrite(pwmpin, pwm);
+  analogWrite(_pwmpin, pwm);
 }
 
 
 potentiometer::potentiometer(int pin) {
-  analogpin = pin;
+  _analogpin = pin;
 }
 
 int potentiometer::getstate() {
-  int mappedValue = map(analogRead(analogpin), 0, 1023, 0, 100);
+  int mappedValue = map(analogRead(_analogpin), 0, 1023, 0, 100);
   return mappedValue;
 }
 
 
 stepper::stepper(int spin, int dpin, int epin, int mspeed, int srange) {
-  steppin = spin;
-  dirpin = dpin;
-  enpin = epin;
-  maxspeed = mspeed;
-  rangespeed = srange;
+  _steppin = spin;
+  _dirpin = dpin;
+  _enpin = epin;
+  _maxspeed = mspeed;
+  _rangespeed = srange;
 
-  bool movedir = false;
-  bool enabled = true;
-  int movespeed = 10;
 
-  pinMode(steppin, OUTPUT);
-  pinMode(dirpin, OUTPUT);
-  pinMode(enpin, OUTPUT);
+  pinMode(_steppin, OUTPUT);
+  pinMode(_dirpin, OUTPUT);
+  pinMode(_enpin, OUTPUT);
 }
 
 
 void stepper::startmove() {
-  digitalWrite(enpin, true);
+  digitalWrite(_enpin, true);
 }
 void stepper::stopmove() {
-  digitalWrite(enpin, false);
+  digitalWrite(_enpin, false);
 }
 
 
@@ -58,7 +55,7 @@ void stepper::changespeed(int moveval) {
   cli();
   //=(16*10^A2)/(B1*A1)-1
 
-  int speed = map(moveval, 0, 100, 0, rangespeed) * maxspeed;
+  int speed = map(moveval, 0, 100, 0, _rangespeed) * _maxspeed;
   OCR1A = speed;
 
   sei();
@@ -66,6 +63,5 @@ void stepper::changespeed(int moveval) {
 
 
 void stepper::switchdir(bool dir) {
-  movedir = dir;
-  digitalWrite(dirpin, movedir);
+  digitalWrite(_dirpin, dir);
 }

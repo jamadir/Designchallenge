@@ -2,7 +2,7 @@
 
 class endstop {
 private:
-  int pin;
+  int _pin;
 
 public:
   endstop(int pin);
@@ -12,8 +12,8 @@ public:
 
 class usbport {
 private:
-  int pwmpin;
-  int dutycycle;
+  int _pwmpin;
+  int _dutycycle;
 
 public:
   usbport(int pwmpin);
@@ -23,8 +23,8 @@ public:
 
 class potentiometer {
 private:
-  int analogpin;
-  int percentage;
+  int _analogpin;
+  int _percentage;
 
 public:
   potentiometer(int analogpin);
@@ -34,14 +34,11 @@ public:
 
 class stepper {
 private:
-  int steppin;
-  int dirpin;
-  int enpin;
-  int maxspeed;
-  int rangespeed;
-  bool movedir = false;
-  bool enabled = true;
-  int movespeed = 10;
+  int _steppin;
+  int _dirpin;
+  int _enpin;
+  int _maxspeed;
+  int _rangespeed;
 
 public:
   stepper(int steppin, int dirpin, int enpin, int avspeed, int srange);

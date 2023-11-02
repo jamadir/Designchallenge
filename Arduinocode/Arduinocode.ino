@@ -55,7 +55,7 @@ stepper stepperm2(stepper2steppin, stepper2dirpin, stepper2enpin, Maxmotorspeed,
 void setup() {
 
   if (statecounter == -1) {
-    Serial.begin(9600);
+    Serial.begin(115200);
   }
 
 
@@ -116,6 +116,7 @@ void loop() {
       if (anfang1.getstate() and anfang2.getstate()) {  //wenn beide am anfang sind nächster schritt
         statecounter = 1;
       }
+      break;
 
 
     case 1:
@@ -126,6 +127,7 @@ void loop() {
       if (bestaeigen.getstate()) {  //bei bestätigung nächster Schritt
         statecounter = 2;
       }
+      break;
 
     case 2:
 
@@ -144,28 +146,30 @@ void loop() {
       if (ende1.getstate() and ende2.getstate()) {  //beginne neu
         statecounter = 0;
       }
+      break;
 
     case -1:  //Debugging outputs werden im seriellen Monitor dargestellt
       Serial.println("endstops:");
-      Serial.print("   a1: ");
+      Serial.print("   a1:\t");
       Serial.print(anfang1.getstate());
-      Serial.print("   e1: ");
+      Serial.print("   e1:\t");
       Serial.print(ende1.getstate());
-      Serial.print("   a2: ");
+      Serial.print("   a2:\t");
       Serial.print(anfang1.getstate());
-      Serial.print("   e2: ");
+      Serial.print("   e2:\t");
       Serial.println(ende1.getstate());
 
       Serial.print("Potis:");
-      Serial.print("   P1: ");
+      Serial.print("   P1:\t");
       Serial.print(poti1.getstate());
-      Serial.print("   P2: ");
-      Serial.println(poti2.getstate());
-
-      Serial.print(Maxmotorspeed);
+      Serial.print("   P2:\t");
+      Serial.print(poti2.getstate());
+      Serial.print("   Stp:\t");
+      Serial.println(statecounter);
 
       stepperm1.switchdir(true);
       stepperm1.changespeed(50);
       stepperm1.startmove();
+      break;
   }
 }
