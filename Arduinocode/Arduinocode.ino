@@ -4,26 +4,23 @@
 // Definiere input pins auf der platine
 #define usbpwmpin 3  //PWM steuerung für USB Port
 
-#define endstop1pina 6  //Endstops für Fahrrad 1
-#define endstop1pine 7
-#define endstop2pina 8  //Endstops für Fahrrad 2
-#define endstop2pine 9
+#define endstop1pina 4  //Endstops für Fahrrad 1
+#define endstop1pine 5
+#define endstop2pina 6  //Endstops für Fahhrad 2
+#define endstop2pine 7
 
 #define bestaetigenpin 8  //Bestätigen button
 #define blankpin 9
 
-#define pot1pin 15  //Poti Speed
-#define pot2pin 16  //Poti Pumpe
+#define pot1pin 19  //Poti Speed
+#define pot2pin 20  //Poti Pumpe
 
-
-#define stepper1enpin 12    //Stepper enable Fahrrad 1
-#define stepper1steppin 14  //Stepper step
-#define stepper1dirpin 13   //Stepper dir
-
-#define stepper2enpin 17    //Stepper enable Fahrrad 2
-#define stepper2steppin 1  //Stepper step
-#define stepper2dirpin 0   //Stepper dir
-
+#define stepper1enpin 21  //Stepper enable
+#define stepper2enpin 18
+#define stepper1steppin 15  //Stepper step
+#define stepper2steppin 16
+#define stepper1dirpin 14  //Stepper dir
+#define stepper2dirpin 10
 
 #define Motorspeedrange 10    //mindestgeschwindigkeit = maxspeed/Motorspeedrange
 
