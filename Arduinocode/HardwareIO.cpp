@@ -6,7 +6,7 @@ endstop::endstop(int pin) {
 }
 
 bool endstop::getstate() {
-  return !digitalRead(_pin);    //Invertiert da schließer
+  return digitalRead(_pin);    //Invertiert da schließer
 }
 
 
@@ -52,13 +52,16 @@ void stepper::stopmove() {
 
 
 void stepper::changespeed(int moveval) {
-  cli();
+  //cli();
   //=(16*10^A2)/(B1*A1)-1
 
   int speed = map(moveval, 0, 100, 0, _rangespeed) * _maxspeed;
-  OCR1A = speed;
+  Serial.print(" spd:\t");
+  Serial.print(speed);
+  //speed = 100;
+  //OCR1A = speed;
 
-  sei();
+  //sei();
 }
 
 
